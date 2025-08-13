@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>相亲匹配提示系统</title>
+  <style>
+    /* 全局变量定义 - 便于统一修改 */
+    :root {
+      --primary: #66BB6A;
+      --primary-light: #81C784;
+      --primary-dark: #388E3C;
+      --bg-light: #f5f5f5;
+      --bg-card: #fff;
+      --bg-info: #f1f8e9;
+      --text-main: #333;
+      --shadow: 0 4px 12px rgba(129, 199, 132, 0.15);
+      --radius: 8px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* 基础样式重置与统一 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    body {
+      background: var(--bg-light);
+      color: var(--text-main);
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 容器优化 - 响应式适配 */
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background: var(--bg-card);
+      border: 2px dashed var(--primary-light);
+      padding: 25px 20px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      animation: bounceIn 0.8s ease-out;
+    }
+
+    /* 标题样式升级 */
+    .title {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      color: var(--primary-dark);
+      border-bottom: 2px solid var(--primary-light);
+      padding-bottom: 12px;
+      margin-bottom: 25px;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+
+    /* 信息区优化 - 增强层次感 */
+    .info {
+      background: var(--bg-info);
+      padding: 18px;
+      margin-bottom: 25px;
+      border-left: 5px solid var(--primary);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      line-height: 2;
+      animation: slideIn 0.8s ease-out;
+    }
+
+    .info span {
+      color: var(--primary-dark);
+      font-weight: bold;
+      position: relative;
+      padding: 0 4px;
+    }
+
+    .info span::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--primary-light);
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: var(--transition);
+    }
+
+    .info:hover span::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+
+    /* 按钮交互强化 */
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 25px;
+      border-radius: var(--radius);
+      transition: var(--transition);
+      animation: fadeIn 1s ease-out;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: var(--transition);
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(56, 142, 60, 0.25);
+    }
+
+    .btn:active {
+      transform: translateY(-1px);
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    /* 输出区优化 - 模拟控制台滚动效果 */
+    .output {
+      background: var(--bg-info);
+      min-height: 120px;
+      padding: 18px;
+      border-top: 3px solid var(--primary);
+      border-radius: 0 0 var(--radius) var(--radius);
+      line-height: 1.8;
+      animation: fadeIn 1.2s ease-out;
+      white-space: pre-wrap;
+      overflow-y: auto;
+      max-height: 200px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary-light) transparent;
+    }
+
+    .output::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .output::-webkit-scrollbar-thumb {
+      background: var(--primary-light);
+      border-radius: 3px;
+    }
+
+    /* 动画优化 - 更自然的曲线 */
+    @keyframes bounceIn {
+      0% { transform: scale(0.9); opacity: 0; }
+      70% { transform: scale(1.05); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes slideIn {
+      0% { transform: translateX(-30px); opacity: 0; }
+      100% { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    /* 响应式细节调整 */
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px 15px;
+      }
+      
+      .info, .output {
+        padding: 14px;
+      }
+      
+      .btn {
+        padding: 12px;
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title">相亲匹配提示系统</div>
+
+    <div class="info">
+      监测对象：<span>白云区胶几人闲聊局群友</span><br>
+      状态提示：<span>单身时长超365天</span><br>
+      建议行动：<span>马上@是嘟嘟冰</span>
+    </div>
+
+    <button class="btn" onclick="startAlert()">启动匹配检测</button>
+
+    <div class="output" id="output">
+      系统提示：等待检测启动...
+    </div>
+  </div>
+
+  <script>
+    // 优化交互逻辑 - 增加状态管理
+    const output = document.getElementById('output');
+    let isDetecting = false;
+
+    function startAlert() {
+      // 防止重复点击
+      if (isDetecting) return;
+      isDetecting = true;
+
+      output.innerHTML = '';
+      printMessage('> 开始检测单身状态...', 0);
+      printMessage('> 正在分析社交数据...', 800);
+      printMessage('> 警告：单身时长已超365天！', 1800);
+      printMessage('> 触发匹配预案：联系群主中...', 3000);
+      printMessage('> 建议：立刻马上请群主帮李耀胜介绍对象 🙏', 4500);
+      
+      // 重置状态
+      setTimeout(() => {
+        isDetecting = false;
+      }, 5000);
+    }
+
+    // 文字逐字输出效果 - 增强交互感
+    function printMessage(text, delay) {
+      setTimeout(() => {
+        let index = 0;
+        const interval = setInterval(() => {
+          if (index < text.length) {
+            output.innerHTML += text.charAt(index);
+            index++;
+            // 自动滚动到底部
+            output.scrollTop = output.scrollHeight;
+          } else {
+            output.innerHTML += '\n';
+            clearInterval(interval);
+          }
+        }, 20);
+      }, delay);
+    }
+  </script>
+</body>
+</html>
